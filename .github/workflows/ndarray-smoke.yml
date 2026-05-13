@@ -1,0 +1,31 @@
+name: ndarray-smoke
+on:
+  push:
+    branches: ["claude/**"]
+  pull_request:
+    branches: ["claude/**", "main", "master"]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Clone ndarray sibling
+        run: |
+          BRANCH="${{ github.head_ref || github.ref_name }}"
+          git clone --depth 1 --branch "$BRANCH" \
+            https://github.com/AdaWorldAPI/ndarray.git ../ndarray \
+            || git clone --depth 1 --branch master \
+            https://github.com/AdaWorldAPI/ndarray.git ../ndarray
+
+      - name: Install Bevy system deps
+        run: sudo apt-get update -y && sudo apt-get install -y libwayland-dev libasound2-dev libudev-dev
+
+      - uses: dtolnay/rust-toolchain@1.95.0
+
+      - name: cargo check --example ndarray_simd_smoke
+        run: cargo check --example ndarray_simd_smoke
+
+      - name: cargo check --example ndarray_graph_plugin
+        run: cargo check --example ndarray_graph_plugin

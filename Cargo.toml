@@ -810,6 +810,22 @@ doc-scrape-examples = false
 [package.metadata.example.ndarray_simd_smoke]
 hidden = true
 
+[[example]]
+name = "ndarray_graph_plugin"
+path = "examples/ndarray_graph_plugin.rs"
+doc-scrape-examples = false
+
+[package.metadata.example.ndarray_graph_plugin]
+hidden = true
+
+[[example]]
+name = "ndarray_graph_plugin_tests"
+path = "examples/ndarray_graph_plugin_tests.rs"
+doc-scrape-examples = false
+
+[package.metadata.example.ndarray_graph_plugin_tests]
+hidden = true
+
 # 2D Rendering
 [[example]]
 name = "bloom_2d"
