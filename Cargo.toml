@@ -741,6 +741,11 @@ rand = "0.10.0"
 chacha20 = { version = "0.10.0", default-features = false, features = ["rng"] }
 ron = "0.12"
 flate2 = "1.0"
+# AdaWorldAPI/ndarray fork: HPC + SIMD polyfill. Path-dep against the sibling
+# checkout for the ndarray_simd_smoke example (proves crate::simd::F32x16
+# routes correctly through to AVX-512/AMX/AVX2/NEON from a downstream crate
+# and that integrate_simd_par composes rayon × SIMD bit-identically).
+ndarray = { path = "../ndarray", features = ["rayon"] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1.0.140"
 bytemuck = "1"
@@ -795,6 +800,14 @@ path = "examples/hello_world.rs"
 doc-scrape-examples = true
 
 [package.metadata.example.hello_world]
+hidden = true
+
+[[example]]
+name = "ndarray_simd_smoke"
+path = "examples/ndarray_simd_smoke.rs"
+doc-scrape-examples = false
+
+[package.metadata.example.ndarray_simd_smoke]
 hidden = true
 
 # 2D Rendering
