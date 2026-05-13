@@ -133,6 +133,15 @@ unused_qualifications = "warn"
 [features]
 default = ["2d", "3d", "ui", "audio"]
 
+# PROFILE: Examples that depend on AdaWorldAPI/ndarray fork (Linux x86_64 only).
+# Marker feature: enabling it lets `cargo build --examples` pick up the
+# ndarray_* examples. Upstream Bevy CI does NOT enable this, so its
+# multi-platform build matrix doesn't try to compile these examples on
+# macOS / Windows / non-x86_64 (where ndarray's AMX + Linux prctl don't
+# build). Local dev / our own CI workflow enables this explicitly via
+# `cargo run --example ndarray_graph_plugin --features ndarray-examples`.
+ndarray-examples = []
+
 # PROFILE: The default 2D Bevy experience. This includes the core Bevy framework, 2D functionality, scenes and picking.
 2d = ["default_app", "default_platform", "2d_bevy_render", "scene", "picking"]
 
@@ -742,6 +751,21 @@ chacha20 = { version = "0.10.0", default-features = false, features = ["rng"] }
 ron = "0.12"
 flate2 = "1.0"
 serde = { version = "1", features = ["derive"] }
+
+# AdaWorldAPI/ndarray fork: HPC + SIMD polyfill — Linux x86_64 ONLY.
+# ndarray uses AMX inline asm + a Linux-x86_64 prctl syscall for AMX tile
+# permission grants, neither of which are available on macOS / Windows /
+# aarch64. The CI matrix on the bevy fork runs all three OS × ISA combos,
+# so without this target.cfg gate, the macOS and Windows runners try
+# (and fail) to fetch + build ndarray. Gating the dep AND stubbing the
+# example mains for non-Linux-x86_64 means upstream cargo check / build
+# passes cleanly on every target.
+#
+# Git dep (not path) so `cargo metadata` works without a sibling checkout
+# (codex P1 on PR #1: `path = "../ndarray"` made every cargo command on
+# the workspace fail unless every dev pre-cloned the sibling).
+[target.'cfg(all(target_os = "linux", target_arch = "x86_64"))'.dev-dependencies]
+ndarray = { git = "https://github.com/AdaWorldAPI/ndarray.git", branch = "master", features = ["rayon"] }
 serde_json = "1.0.140"
 bytemuck = "1"
 # The following explicit dependencies are needed for proc macros to work inside of examples as they are part of the bevy crate itself.
@@ -795,6 +819,33 @@ path = "examples/hello_world.rs"
 doc-scrape-examples = true
 
 [package.metadata.example.hello_world]
+hidden = true
+
+[[example]]
+name = "ndarray_simd_smoke"
+path = "examples/ndarray_simd_smoke.rs"
+doc-scrape-examples = false
+required-features = ["ndarray-examples"]
+
+[package.metadata.example.ndarray_simd_smoke]
+hidden = true
+
+[[example]]
+name = "ndarray_graph_plugin"
+path = "examples/ndarray_graph_plugin.rs"
+doc-scrape-examples = false
+required-features = ["ndarray-examples"]
+
+[package.metadata.example.ndarray_graph_plugin]
+hidden = true
+
+[[example]]
+name = "ndarray_graph_plugin_tests"
+path = "examples/ndarray_graph_plugin_tests.rs"
+doc-scrape-examples = false
+required-features = ["ndarray-examples"]
+
+[package.metadata.example.ndarray_graph_plugin_tests]
 hidden = true
 
 # 2D Rendering

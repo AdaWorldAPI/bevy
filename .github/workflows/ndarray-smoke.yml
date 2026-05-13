@@ -1,0 +1,44 @@
+name: ndarray-smoke
+on:
+  push:
+    branches: ["claude/**"]
+  pull_request:
+    branches: ["claude/**", "main", "master"]
+
+# Minimum permission set per CodeQL "Workflow does not contain permissions"
+# rule on PR #1. The job only checks out + builds; no write needs.
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      # Pinned to commit SHA per zizmor unpinned-action rule on PR #1.
+      # v4.1.7 corresponds to commit 692973e3d937129bcbf40652eb9f2f61becf3332.
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332
+
+      - name: Install Bevy system deps
+        run: sudo apt-get update -y && sudo apt-get install -y libwayland-dev libasound2-dev libudev-dev
+
+      # Pinned to commit SHA per zizmor unpinned-action rule on PR #1.
+      # The action treats "1.95.0" as a toolchain version, but the action ref
+      # itself must be a commit SHA. Commit f04cf2e09f5b6448b46c0aa9893a76ee36ed64c2
+      # corresponds to the stable tag.
+      - uses: dtolnay/rust-toolchain@f04cf2e09f5b6448b46c0aa9893a76ee36ed64c2
+        with:
+          toolchain: "1.95.0"
+
+      # ndarray is now a git dev-dep in Cargo.toml (codex P1 fix on PR #1),
+      # so the workflow no longer needs to clone ../ndarray. The
+      # ndarray-examples feature must be enabled because the [[example]]
+      # entries require it (so upstream Bevy CI doesn't try to build them
+      # on macOS / Windows where ndarray's AMX path doesn't compile).
+      - name: cargo check --example ndarray_simd_smoke
+        run: cargo check --example ndarray_simd_smoke --features ndarray-examples
+
+      - name: cargo check --example ndarray_graph_plugin
+        run: cargo check --example ndarray_graph_plugin --features ndarray-examples
+
+      - name: cargo check --example ndarray_graph_plugin_tests
+        run: cargo check --example ndarray_graph_plugin_tests --features ndarray-examples
