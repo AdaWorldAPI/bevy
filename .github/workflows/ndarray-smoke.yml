@@ -37,6 +37,11 @@ jobs:
       - name: cargo check --example ndarray_simd_smoke
         run: cargo check --example ndarray_simd_smoke --features ndarray-examples
 
+      # ndarray's reverse-engineered, zero-external-dep BLAS L3 GEMM
+      # (native SIMD f32 / int8 / bf16 — no libmkl_rt, no libopenblas).
+      - name: cargo check --example ndarray_gemm_smoke
+        run: cargo check --example ndarray_gemm_smoke --features ndarray-examples
+
       - name: cargo check --example ndarray_graph_plugin
         run: cargo check --example ndarray_graph_plugin --features ndarray-examples
 
