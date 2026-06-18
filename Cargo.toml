@@ -765,7 +765,9 @@ serde = { version = "1", features = ["derive"] }
 # (codex P1 on PR #1: `path = "../ndarray"` made every cargo command on
 # the workspace fail unless every dev pre-cloned the sibling).
 [target.'cfg(all(target_os = "linux", target_arch = "x86_64"))'.dev-dependencies]
-ndarray = { git = "https://github.com/AdaWorldAPI/ndarray.git", branch = "master", features = ["rayon"] }
+ndarray = { git = "https://github.com/AdaWorldAPI/ndarray.git", branch = "master", features = [
+  "rayon",
+] }
 serde_json = "1.0.140"
 bytemuck = "1"
 # The following explicit dependencies are needed for proc macros to work inside of examples as they are part of the bevy crate itself.

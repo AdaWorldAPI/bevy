@@ -7,7 +7,7 @@
 //! The [`PALETTE_LUT`] maps each of the 16 `PaletteTier::Full16` palette
 //! indices to an RGBA byte quad.  The palette is Neo4j/Palantir-inspired:
 //! index 0 is a dark-navy background, indices 1–12 graduate through
-//! deep-blue → cyan → white, and indices 13–15 are hot accent colours
+//! deep-blue → cyan → white, and indices 13–15 are hot accent colors
 //! (amber → hot-orange → crimson-red).
 //!
 //! # Usage from the plugin

@@ -13,6 +13,14 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+    # GitHub Actions runners are x86-64-v3 (AVX2) at most — they do NOT have
+    # AVX-512 and will SIGILL on x86-64-v4 instructions. Pin target-cpu to v3
+    # so ndarray's compile-time SIMD dispatch (`cfg(target_feature = "avx512f")`)
+    # selects the AVX2 path — the only path these runners can build and run.
+    # Never x86-64-v4 in CI (that is the opt-in `run-avx512` alias for local
+    # Sapphire Rapids / Zen 4 hosts only).
+    env:
+      RUSTFLAGS: "-C target-cpu=x86-64-v3"
     steps:
       # Pinned to commit SHA per zizmor unpinned-action rule on PR #1.
       # v4.1.7 corresponds to commit 692973e3d937129bcbf40652eb9f2f61becf3332.

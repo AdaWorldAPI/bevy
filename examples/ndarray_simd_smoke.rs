@@ -75,7 +75,11 @@ fn main() {
         p_before,
         p_after
     );
-    println!("[smoke] integrate_simd advanced by {} (expected {})", p_after - p_before, dt);
+    println!(
+        "[smoke] integrate_simd advanced by {} (expected {})",
+        p_after - p_before,
+        dt
+    );
 
     // 4. rayon × SIMD: integrate_simd_par must match integrate_simd bit-exactly.
     //    Buffer is 4 × BLOCK_FLOATS so rayon actually parallelizes.

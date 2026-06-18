@@ -90,7 +90,13 @@ fn main() {
     let caps = simd_caps();
     println!(
         "[gemm] caps: avx512f={} avx512vnni={} avx512bf16={} amx_tile={} avx2={} fma={} neon={}",
-        caps.avx512f, caps.avx512vnni, caps.avx512bf16, caps.amx_tile, caps.avx2, caps.fma, caps.neon
+        caps.avx512f,
+        caps.avx512vnni,
+        caps.avx512bf16,
+        caps.amx_tile,
+        caps.avx2,
+        caps.fma,
+        caps.neon
     );
 
     // Shared operands: A = [[1,2,3],[4,5,6]] (2x3), B = [[7,8],[9,10],[11,12]] (3x2).
