@@ -2,7 +2,7 @@
 //!
 //! This module is a standalone library with no Bevy or ndarray dependencies.
 //! It is imported by `ndarray_graph_plugin.rs` which uses the
-//! `ndarray::simd::PaletteTier::Full16` tier (16-color palette).
+//! `ndarray::hpc::framebuffer::PaletteTier::Full16` tier (16-color palette).
 //!
 //! The [`PALETTE_LUT`] maps each of the 16 `PaletteTier::Full16` palette
 //! indices to an RGBA byte quad.  The palette is Neo4j/Palantir-inspired:

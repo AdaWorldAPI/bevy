@@ -34,19 +34,24 @@ sudo apt-get update -y
 sudo apt-get install -y libwayland-dev libasound2-dev libudev-dev
 ```
 
-**Sibling ndarray checkout**
+**ndarray dependency (git dev-dep — no sibling checkout needed)**
 
-The Bevy `Cargo.toml` depends on ndarray as a local path dependency
-(`../ndarray`). The ndarray tree must be checked out next to the bevy
-tree before building:
+The Bevy `Cargo.toml` depends on ndarray as a **git dev-dependency**,
+pinned to the `master` branch of the AdaWorldAPI fork and gated to
+Linux x86_64:
 
+```toml
+[target.'cfg(all(target_os = "linux", target_arch = "x86_64"))'.dev-dependencies]
+ndarray = { git = "https://github.com/AdaWorldAPI/ndarray.git", branch = "master", features = ["rayon"] }
 ```
-git clone https://github.com/AdaWorldAPI/ndarray.git ../ndarray
-```
 
-Both repos must be on matching branches for the feature flags to align.
-The CI workflow clones the same-named branch if it exists, falling back
-to `master`.
+Cargo fetches and builds it automatically — there is **no** need to clone
+a sibling `../ndarray` tree. (Earlier revisions used `path = "../ndarray"`,
+which made every `cargo` command fail without a sibling checkout; PR #1
+switched to the git dependency so `cargo metadata` works standalone.) The
+`cfg` gate is required because ndarray's AMX inline asm and the
+AMX-permission `prctl` syscall only exist on Linux x86_64, so macOS /
+Windows / aarch64 CI runners never try to fetch or build it.
 
 ---
 
@@ -188,7 +193,7 @@ fleet:
 |------|-------|----------|
 | `bevy/examples/ndarray_graph_plugin.rs` | agent #1 plugin-core | `NdarrayGraphPlugin` struct and impl, Bevy systems (`tick_renderer`, `rasterize_to_framebuffer`, `palette_blit`), `Cargo.toml` `[[example]]` entry |
 | `bevy/examples/ndarray_graph_palette.rs` | agent #2 plugin-palette | Compile-time RGBA LUT, `palette_to_rgba` expansion function, tier-keyed color definitions for nodes / edges / background |
-| `bevy/.github/workflows/ndarray-smoke.yml` | agent #3 plugin-ci | GitHub Actions workflow: clones ndarray sibling, installs system deps, sets Rust 1.95.0, runs `cargo check` on both `ndarray_simd_smoke` and `ndarray_graph_plugin` examples on every push/PR to `claude/**` branches |
+| `bevy/.github/workflows/ndarray-smoke.yml` | agent #3 plugin-ci | GitHub Actions workflow: installs system deps, sets Rust 1.95.0, and runs `cargo check --features ndarray-examples` on the `ndarray_simd_smoke`, `ndarray_graph_plugin`, and `ndarray_graph_plugin_tests` examples on every push/PR to `claude/**` branches (ndarray is a git dev-dep, so no sibling clone is needed) |
 | `bevy/examples/README_NDARRAY_PLUGIN.md` | agent #4 plugin-readme | This file |
 
 The existing smoke test at `bevy/examples/ndarray_simd_smoke.rs` remains

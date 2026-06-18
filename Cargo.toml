@@ -830,6 +830,25 @@ required-features = ["ndarray-examples"]
 [package.metadata.example.ndarray_simd_smoke]
 hidden = true
 
+# `ndarray_graph_palette` is a shared palette-LUT helper that the
+# `ndarray_graph_plugin` example pulls in via `#[path = "ndarray_graph_palette.rs"]`.
+# It has no `main()` (it is a palette-index → RGBA library, not a runnable
+# example), so it is registered as a `lib` crate-type target — the same pattern
+# Bevy uses for the shared helper `examples/helpers/widgets.rs`. Without this
+# explicit entry, Cargo auto-discovers the bare `examples/ndarray_graph_palette.rs`
+# file as a *binary* example target with no `required-features` gate, and
+# `cargo build --examples` / `cargo check --all-targets` then fails with E0601
+# (`main` function not found) on every platform.
+[[example]]
+name = "ndarray_graph_palette"
+path = "examples/ndarray_graph_palette.rs"
+doc-scrape-examples = false
+required-features = ["ndarray-examples"]
+crate-type = ["lib"]
+
+[package.metadata.example.ndarray_graph_palette]
+hidden = true
+
 [[example]]
 name = "ndarray_graph_plugin"
 path = "examples/ndarray_graph_plugin.rs"
