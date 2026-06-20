@@ -87,9 +87,11 @@ deny = [
   { name = "glam", deny-multiple-versions = true },
   { name = "raw-window-handle", deny-multiple-versions = true },
 ]
-skip = [
-  { name = "bevy_math", reason = "bevy_math has a path dev dependency on itself without a version" },
-]
+# No skips: cargo-deny's `unnecessary-skip` lint errors on a skip for a crate
+# that resolves to a single version, and bevy_math does in this graph. (It is
+# not in the deny-multiple-versions list above, so any future duplicate only
+# warns via `multiple-versions = "warn"`, never fails.)
+skip = []
 
 [sources]
 unknown-registry = "deny"
