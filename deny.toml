@@ -95,7 +95,9 @@ skip = [
 unknown-registry = "deny"
 unknown-git = "deny"
 allow-registry = ["https://github.com/rust-lang/crates.io-index"]
-allow-git = []
+# AdaWorldAPI/ndarray fork is a git dev-dependency (Linux x86_64 only); the
+# `[sources]` check denies unknown git sources, so it must be allow-listed.
+allow-git = ["https://github.com/AdaWorldAPI/ndarray"]
 
 # thiserror is the preferred way to derive error types
 [[bans.features]]

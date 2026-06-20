@@ -751,23 +751,6 @@ chacha20 = { version = "0.10.0", default-features = false, features = ["rng"] }
 ron = "0.12"
 flate2 = "1.0"
 serde = { version = "1", features = ["derive"] }
-
-# AdaWorldAPI/ndarray fork: HPC + SIMD polyfill — Linux x86_64 ONLY.
-# ndarray uses AMX inline asm + a Linux-x86_64 prctl syscall for AMX tile
-# permission grants, neither of which are available on macOS / Windows /
-# aarch64. The CI matrix on the bevy fork runs all three OS × ISA combos,
-# so without this target.cfg gate, the macOS and Windows runners try
-# (and fail) to fetch + build ndarray. Gating the dep AND stubbing the
-# example mains for non-Linux-x86_64 means upstream cargo check / build
-# passes cleanly on every target.
-#
-# Git dep (not path) so `cargo metadata` works without a sibling checkout
-# (codex P1 on PR #1: `path = "../ndarray"` made every cargo command on
-# the workspace fail unless every dev pre-cloned the sibling).
-[target.'cfg(all(target_os = "linux", target_arch = "x86_64"))'.dev-dependencies]
-ndarray = { git = "https://github.com/AdaWorldAPI/ndarray.git", branch = "master", features = [
-  "rayon",
-] }
 serde_json = "1.0.140"
 bytemuck = "1"
 # The following explicit dependencies are needed for proc macros to work inside of examples as they are part of the bevy crate itself.
@@ -793,6 +776,23 @@ accesskit = "0.24"
 nonmax = "0.5"
 gltf = "1.4"
 indexmap = "2"
+
+# AdaWorldAPI/ndarray fork: HPC + SIMD polyfill — Linux x86_64 ONLY.
+# ndarray uses AMX inline asm + a Linux-x86_64 prctl syscall for AMX tile
+# permission grants, neither of which are available on macOS / Windows /
+# aarch64. ONLY ndarray is platform-gated — the bevy_* / serde_json / argh /
+# anyhow dev-deps above are required by ordinary Bevy examples and tests on
+# every OS, so they must stay unconditional. (Gating them broke the macOS /
+# Windows example + test builds: `bevy_render` / `bevy_ecs` went missing
+# off-Linux, e.g. tests/ecs/ambiguity_detection.rs failed with E0433.)
+#
+# Git dep (not path) so `cargo metadata` works without a sibling checkout
+# (codex P1 on PR #1: `path = "../ndarray"` made every cargo command on
+# the workspace fail unless every dev pre-cloned the sibling).
+[target.'cfg(all(target_os = "linux", target_arch = "x86_64"))'.dev-dependencies]
+ndarray = { git = "https://github.com/AdaWorldAPI/ndarray.git", branch = "master", features = [
+  "rayon",
+] }
 
 [target.'cfg(not(target_family = "wasm"))'.dev-dependencies]
 ureq = { version = "3.0.8", features = ["json"] }

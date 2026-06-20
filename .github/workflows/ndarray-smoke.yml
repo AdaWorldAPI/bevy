@@ -29,11 +29,11 @@ jobs:
       - name: Install Bevy system deps
         run: sudo apt-get update -y && sudo apt-get install -y libwayland-dev libasound2-dev libudev-dev
 
-      # Pinned to commit SHA per zizmor unpinned-action rule on PR #1.
-      # The action treats "1.95.0" as a toolchain version, but the action ref
-      # itself must be a commit SHA. Commit f04cf2e09f5b6448b46c0aa9893a76ee36ed64c2
-      # corresponds to the stable tag.
-      - uses: dtolnay/rust-toolchain@f04cf2e09f5b6448b46c0aa9893a76ee36ed64c2
+      # Pinned to the same dtolnay/rust-toolchain commit the rest of the Bevy
+      # CI uses (ci.yml, dependencies.yml, example-run.yml, …). The previous
+      # pin was a non-existent SHA, so the job failed to resolve the action at
+      # "Set up job" in ~2s and never ran the cargo checks below.
+      - uses: dtolnay/rust-toolchain@3c5f7ea28cd621ae0bf5283f0e981fb97b8a7af9
         with:
           toolchain: "1.95.0"
 
