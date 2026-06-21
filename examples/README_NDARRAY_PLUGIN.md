@@ -66,15 +66,15 @@ polyfill picks the 8-lane AVX2 path; `PREFERRED_F32_LANES` is 8.
 cargo run --example ndarray_graph_plugin
 ```
 
-### AVX-512 build (x86-64-v4, Sapphire Rapids / Ice Lake-SP / Zen 4+)
+### AVX-512 build (local AVX-512 hosts only — never CI)
 
-The `run-avx512` alias is defined in `.cargo/config_ndarray_simd.toml`.
-Copy or merge that file into `.cargo/config.toml` before using it.
-This build will SIGILL on any host without AVX-512F; do not run it in CI
-on stock GitHub Actions runners.
+GitHub Actions runners are x86-64-v3 (AVX2) and SIGILL on AVX-512, so there
+is no canned alias. On a local AVX-512 box (Sapphire Rapids / Ice Lake-SP /
+Zen 4), emit AVX-512 code by setting `target-cpu` yourself. The polyfill
+still runtime-detects the tier, so this only changes the compiled code path:
 
 ```sh
-cargo run-avx512 --example ndarray_graph_plugin
+RUSTFLAGS="-C target-cpu=native" cargo run --example ndarray_graph_plugin
 ```
 
 ---
@@ -164,8 +164,8 @@ signals are not automatically reconciled.
   `PREFERRED_F32_LANES = 8`. The runtime tier reported by `simd_caps()`
   is informational only — no code path switches based on it.
 
-- `target-cpu=x86-64-v4` (via `cargo run-avx512` alias): the compiler
-  emits AVX-512 code; `cfg(target_feature = "avx512f")` is true at
+- `target-cpu=x86-64-v4` / `native` (via `RUSTFLAGS`, local AVX-512 hosts
+  only): the compiler emits AVX-512 code; `cfg(target_feature = "avx512f")` is true at
   compile time; `F32x16::mul_add` compiles to 16-lane `_mm512_fmadd_ps`;
   `PREFERRED_F32_LANES = 16`. The runtime `simd_caps()` tier now agrees
   with compile time.
@@ -179,8 +179,8 @@ The plugin prints both values at startup:
 
 A mismatch is not an error — it is expected on Sapphire Rapids with a
 CI-safe x86-64-v3 binary — but it means you are leaving AVX-512 throughput
-on the table. Pass `-C target-cpu=x86-64-v4` (via the `run-avx512` alias)
-to close the gap.
+on the table. Build locally with `RUSTFLAGS="-C target-cpu=native"` to close
+the gap — never in CI, where GitHub runners SIGILL on AVX-512.
 
 ---
 

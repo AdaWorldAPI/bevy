@@ -17,8 +17,8 @@ jobs:
     # AVX-512 and will SIGILL on x86-64-v4 instructions. Pin target-cpu to v3
     # so ndarray's compile-time SIMD dispatch (`cfg(target_feature = "avx512f")`)
     # selects the AVX2 path — the only path these runners can build and run.
-    # Never x86-64-v4 in CI (that is the opt-in `run-avx512` alias for local
-    # Sapphire Rapids / Zen 4 hosts only).
+    # Never x86-64-v4 in CI; AVX-512 is a local-only `RUSTFLAGS="-C
+    # target-cpu=native"` choice (Sapphire Rapids / Zen 4 hosts).
     env:
       RUSTFLAGS: "-C target-cpu=x86-64-v3"
     steps:

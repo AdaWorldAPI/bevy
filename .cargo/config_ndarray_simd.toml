@@ -1,45 +1,21 @@
 # Copy this file to `.cargo/config.toml` (or merge into your existing one)
-# to enable AVX-512 builds of the AdaWorldAPI/ndarray SIMD polyfill from
-# this Bevy fork.
+# to build the AdaWorldAPI/ndarray SIMD polyfill with a CI-safe `target-cpu`.
 #
-# ## What it does
+# `target-cpu=x86-64-v3` (AVX2) is the only baseline that runs on every
+# GitHub Actions runner. GitHub's stock runners are x86-64-v3 — they do NOT
+# have x86-64-v4 (AVX-512) and SIGILL on AVX-512 instructions, so this file
+# never sets v4. `crate::simd::F32x16` picks the 8-lane AVX2 path;
+# `PREFERRED_F32_LANES` is 8.
 #
-# Two build profiles for the ndarray polyfill — chosen at compile time
-# via `target-cpu`, never at runtime:
+# The polyfill still auto-detects the live CPU tier at runtime via
+# `simd_caps()`, so results are correct on AVX-512 hosts too — the ndarray
+# smoke test prints `simd_caps()` at startup, which surfaces the (expected)
+# mismatch between a runtime `avx512f=true` host and this compile-time v3
+# build (`PREFERRED_F32_LANES=8`).
 #
-# - **Default** (`cargo build`): `target-cpu=x86-64-v3`. AVX2 baseline.
-#   Works on every GitHub Actions runner. `crate::simd::F32x16` picks
-#   the 8-lane AVX2 path; `U8x64` ditto.
-#
-# - **Opt-in AVX-512** (`cargo build-avx512`): `target-cpu=x86-64-v4`.
-#   Polyfill picks the 16-lane AVX-512 path. Required for the
-#   `ndarray_simd_smoke` / `ndarray_graph_plugin` examples to exercise
-#   `__m512` / `permute_bytes` / `pairwise_avg` (PR #112's rasterizer
-#   intrinsics). Only run on hardware with AVX-512F (Sapphire Rapids,
-#   Ice Lake-SP, Zen 4 with AVX-512, etc.). CI runners WILL SIGILL.
-#
-# ## Why two profiles
-#
-# GitHub Actions stock runners support x86-64-v3 (AVX2) but NOT
-# x86-64-v4 (AVX-512). Unconditionally setting `target-cpu=x86-64-v4`
-# would break CI. Project convention is: default build = CI-safe
-# baseline; AVX-512 = explicit opt-in via cargo alias.
-#
-# ## Runtime sanity
-#
-# Whichever profile you build with, the ndarray smoke test prints
-# `simd_caps()` at startup (CPUID-detected at runtime via the LazyLock
-# singleton). The smoke test catches the mismatch between
-# runtime-detected `avx512f=true` and a compile-time x86-64-v3 build
-# (`PREFERRED_F32_LANES=8`) — that's the asymmetry to watch for.
+# To emit AVX-512 *code* on a local AVX-512 box (Sapphire Rapids / Ice
+# Lake-SP / Zen 4), build with `RUSTFLAGS="-C target-cpu=native"` yourself.
+# Do NOT commit a v4 `target-cpu` here, and never run such a binary in CI.
 
 [build]
 rustflags = ["-C", "target-cpu=x86-64-v3"]
-
-[alias]
-# AVX-512 variants — for AdaWorldAPI dev boxes (Sapphire Rapids+).
-# Do NOT run these binaries on a non-AVX-512 host.
-build-avx512 = ["build", "--config", "build.rustflags=['-C','target-cpu=x86-64-v4']"]
-run-avx512   = ["run",   "--config", "build.rustflags=['-C','target-cpu=x86-64-v4']"]
-test-avx512  = ["test",  "--config", "build.rustflags=['-C','target-cpu=x86-64-v4']"]
-check-avx512 = ["check", "--config", "build.rustflags=['-C','target-cpu=x86-64-v4']"]
