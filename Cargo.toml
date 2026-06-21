@@ -133,13 +133,7 @@ unused_qualifications = "warn"
 [features]
 default = ["2d", "3d", "ui", "audio"]
 
-# PROFILE: Examples that depend on AdaWorldAPI/ndarray fork (Linux x86_64 only).
-# Marker feature: enabling it lets `cargo build --examples` pick up the
-# ndarray_* examples. Upstream Bevy CI does NOT enable this, so its
-# multi-platform build matrix doesn't try to compile these examples on
-# macOS / Windows / non-x86_64 (where ndarray's AMX + Linux prctl don't
-# build). Local dev / our own CI workflow enables this explicitly via
-# `cargo run --example ndarray_graph_plugin --features ndarray-examples`.
+# PROFILE: Opt-in marker enabling the AdaWorldAPI/ndarray example targets (ndarray_simd_smoke, ndarray_gemm_smoke, ndarray_graph_plugin/_tests). Gated to Linux x86_64 because ndarray's AMX asm + Linux prctl don't build elsewhere; off by default so upstream Bevy CI skips them.
 ndarray-examples = []
 
 # PROFILE: The default 2D Bevy experience. This includes the core Bevy framework, 2D functionality, scenes and picking.
