@@ -784,7 +784,7 @@ indexmap = "2"
 # (codex P1 on PR #1: `path = "../ndarray"` made every cargo command on
 # the workspace fail unless every dev pre-cloned the sibling).
 [target.'cfg(all(target_os = "linux", target_arch = "x86_64"))'.dev-dependencies]
-ndarray = { git = "https://github.com/AdaWorldAPI/ndarray.git", branch = "master", features = [
+ndarray = { git = "https://github.com/AdaWorldAPI/ndarray.git", branch = "master", version = "0.17", features = [
   "rayon",
 ] }
 
