@@ -22,6 +22,7 @@ bevy = { version = "0.18", default-features = false, features = ["2d"] }
 |Profile|Description|
 |-|-|
 |default|The full default Bevy experience. This is a combination of the following profiles: 2d, 3d, ui, audio|
+|ndarray-examples|Opt-in marker enabling the AdaWorldAPI/ndarray example targets (ndarray_simd_smoke, ndarray_gemm_smoke, ndarray_graph_plugin/_tests). Gated to Linux x86_64 because ndarray's AMX asm + Linux prctl don't build elsewhere; off by default so upstream Bevy CI skips them.|
 |2d|The default 2D Bevy experience. This includes the core Bevy framework, 2D functionality, scenes and picking.|
 |3d|The default 3D Bevy experience. This includes the core Bevy framework, 3D functionality, scenes and picking.|
 |ui|The default Bevy UI experience. This includes the core Bevy framework, Bevy UI, scenes, and picking.|

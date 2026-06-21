@@ -24,7 +24,7 @@
 
 use bevy::prelude::*;
 use ndarray::hpc::framebuffer::{compose_neo4j, Framebuffer};
-use ndarray::hpc::renderer::{DT_60, GLOBAL_RENDERER, RenderFrame, Renderer};
+use ndarray::hpc::renderer::{RenderFrame, Renderer, DT_60, GLOBAL_RENDERER};
 use ndarray::hpc::simd_caps::simd_caps;
 use ndarray::simd::PREFERRED_F32_LANES;
 
@@ -244,7 +244,10 @@ fn test_polyfill_runtime_tier_matches_expectation() {
             caps.avx512f || caps.avx2,
             "Expected avx512f or avx2 to be true on x86_64, got caps={caps:?}"
         );
-        println!("[test 5] PASS: x86_64 has avx512f={} or avx2={}", caps.avx512f, caps.avx2);
+        println!(
+            "[test 5] PASS: x86_64 has avx512f={} or avx2={}",
+            caps.avx512f, caps.avx2
+        );
     }
 
     #[cfg(not(target_arch = "x86_64"))]

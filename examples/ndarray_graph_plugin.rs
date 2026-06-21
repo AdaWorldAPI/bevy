@@ -1,8 +1,8 @@
 //! # NdarrayGraphPlugin — Bevy plugin for SIMD-accelerated graph rendering
 //!
-//! Visualises a force-directed graph using `ndarray::hpc::renderer::Renderer`
+//! Visualizes a force-directed graph using `ndarray::hpc::renderer::Renderer`
 //! (double-buffered, SIMD-integrated) and `ndarray::hpc::framebuffer::Framebuffer`
-//! (palette-indexed rasteriser). Each frame:
+//! (palette-indexed rasterizer). Each frame:
 //!
 //! 1. `tick_renderer` — advances physics via `Renderer::tick(dt, 0.98)`.
 //! 2. `render_to_framebuffer` — rasterises via `compose_neo4j` into a
@@ -47,7 +47,7 @@ const NODE_COLOR: u8 = 15;
 const EDGE_COLOR: u8 = 8;
 /// Scale factor: logical units → framebuffer pixels.
 const SCALE: f32 = 8.0;
-/// Offset that maps the graph origin to the centre of the 512×512 framebuffer.
+/// Offset that maps the graph origin to the center of the 512×512 framebuffer.
 const OFFSET: (f32, f32) = (256.0, 256.0);
 /// Physics damping applied each tick (≈ 2 % velocity bleed per frame at 60 Hz).
 const DAMPING: f32 = 0.98;
@@ -60,7 +60,7 @@ const DAMPING: f32 = 0.98;
 #[derive(Resource)]
 pub struct GraphRenderer {
     renderer: Box<Renderer>,
-    /// Flat edge list shared between the seeder and the rasteriser.
+    /// Flat edge list shared between the seeder and the rasterizer.
     edges: Vec<(usize, usize)>,
 }
 
@@ -88,11 +88,11 @@ pub struct NdarrayGraphPlugin;
 
 impl Plugin for NdarrayGraphPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Startup, (setup_camera, setup_render_surface, seed_graph).chain())
-            .add_systems(
-                Update,
-                (tick_renderer, render_to_framebuffer).chain(),
-            );
+        app.add_systems(
+            Startup,
+            (setup_camera, setup_render_surface, seed_graph).chain(),
+        )
+        .add_systems(Update, (tick_renderer, render_to_framebuffer).chain());
     }
 }
 
@@ -105,10 +105,7 @@ fn setup_camera(mut commands: Commands) {
 
 /// Allocate the long-lived `Framebuffer` and the Bevy `Image`, then spawn
 /// the `Sprite` that displays it.
-fn setup_render_surface(
-    mut commands: Commands,
-    mut images: ResMut<Assets<Image>>,
-) {
+fn setup_render_surface(mut commands: Commands, mut images: ResMut<Assets<Image>>) {
     // Allocate a 512×512 RGBA8 image filled with black (palette index 0).
     let rgba = PALETTE_LUT[0];
     let image = Image::new_fill(
@@ -174,10 +171,7 @@ fn seed_graph(mut commands: Commands) {
         }
     }
 
-    commands.insert_resource(GraphRenderer {
-        renderer,
-        edges,
-    });
+    commands.insert_resource(GraphRenderer { renderer, edges });
 }
 
 // ── Update systems ────────────────────────────────────────────────────────────
@@ -234,7 +228,7 @@ fn render_to_framebuffer(
 
     // Shared palette expander from `ndarray_graph_palette.rs`. Equivalent to
     // the inline loop but the LUT lives in one place so the smoke test and
-    // tests pick up the same colours.
+    // tests pick up the same colors.
     blit_u8_palette_to_rgba(pixels, data);
 }
 
